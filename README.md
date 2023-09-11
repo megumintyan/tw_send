@@ -15,7 +15,7 @@ quote
 
 poll
 
-`./tw_send 'do you like pizza?' -p '"yes","no","maybe"' 120`
+`./tw_send 'do you like pizza?' -p 'yes,,no,,maybe' 120`
 
 delete
 
