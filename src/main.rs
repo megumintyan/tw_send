@@ -176,10 +176,30 @@ impl Tokens {
 impl Message {
     fn do_tweet(&self, access_token: &str) -> oauth2::HttpResponse {
         let body = match self.message_type.as_ref().unwrap() {
-            MessageType::TEXT => format!("{{\"text\": \"{}\"}}", self.text.as_ref().unwrap()),
-            MessageType::REPLY => format!("{{\"text\": \"{}\", \"reply\": {{\"in_reply_to_tweet_id\": \"{}\"}} }}", self.text.as_ref().unwrap(), self.id.as_ref().unwrap()),
-            MessageType::QUOTE => format!("{{\"text\": \"{}\", \"quote_tweet_id\": \"{}\"}}", self.text.as_ref().unwrap(), self.id.as_ref().unwrap()),
-            MessageType::POLL => format!("{{\"text\": \"{}\", \"poll\": {{\"options\": [{}], \"duration_minutes\": {} }}}}", self.text.as_ref().unwrap(), self.poll.as_ref().unwrap(), self.duration.as_ref().unwrap()),
+            MessageType::TEXT =>
+                serde_json::json!({
+                    "text": self.text.as_ref().unwrap(),
+                }).to_string(),
+            MessageType::REPLY =>
+                serde_json::json!({
+                    "text": self.text.as_ref().unwrap(),
+                    "reply": {
+                        "in_reply_to_tweet_id": self.id.as_ref().unwrap()
+                    }
+                }).to_string(),
+            MessageType::QUOTE =>
+                serde_json::json!({
+                    "text": self.text.as_ref().unwrap(),
+                    "quote_tweet_id": self.id.as_ref().unwrap()
+                }).to_string(),
+            MessageType::POLL =>
+                serde_json::json!({
+                    "text": self.text.as_ref().unwrap(),
+                    "poll": {
+                        "options": self.poll.as_ref().unwrap().split(",,").collect::<Vec<&str>>(),
+                        "duration_minutes": self.duration.as_ref().unwrap().parse::<i32>().unwrap()
+                    }
+                }).to_string(),
         };
 
         let url = "https://api.twitter.com/2/tweets".to_string();

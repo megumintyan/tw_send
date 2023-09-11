@@ -844,6 +844,7 @@ name = "tw_send"
 version = "0.1.0"
 dependencies = [
  "oauth2",
+ "serde_json",
 ]
 
 [[package]]
